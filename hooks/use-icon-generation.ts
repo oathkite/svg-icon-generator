@@ -1,89 +1,88 @@
-import { useState } from 'react'
-import { toast } from 'sonner'
-import { IconMetadata, GenerationResult, Alternative } from '@/types'
+import type { Alternative, GenerationResult, IconMetadata } from "@/types";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export function useIconGeneration() {
-  const [loading, setLoading] = useState(false)
-  const [svg, setSvg] = useState('')
-  const [quality, setQuality] = useState(0)
-  const [alternatives, setAlternatives] = useState<Alternative[]>([])
-  const [iconSource, setIconSource] = useState<string>('')
-  const [metadata, setMetadata] = useState<IconMetadata | null>(null)
+	const [loading, setLoading] = useState(false);
+	const [svg, setSvg] = useState("");
+	const [quality, setQuality] = useState(0);
+	const [alternatives, setAlternatives] = useState<Alternative[]>([]);
+	const [iconSource, setIconSource] = useState<string>("");
+	const [metadata, setMetadata] = useState<IconMetadata | null>(null);
 
-  const generate = async (prompt: string): Promise<GenerationResult | null> => {
-    if (!prompt.trim()) {
-      toast.error('プロンプトを入力してください')
-      return null
-    }
+	const generate = async (prompt: string): Promise<GenerationResult | null> => {
+		if (!prompt.trim()) {
+			toast.error("プロンプトを入力してください");
+			return null;
+		}
 
-    setLoading(true)
-    
-    try {
-      const response = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt }),
-      })
+		setLoading(true);
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
+		try {
+			const response = await fetch("/api/generate", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ prompt }),
+			});
 
-      const data = await response.json()
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`);
+			}
 
-      if (data.svg) {
-        setSvg(data.svg)
-        setQuality(data.confidence || 0)
-        setAlternatives(data.alternatives || [])
-        setIconSource(data.source || 'unknown')
-        setMetadata(data.metadata || null)
+			const data = await response.json();
 
-        return {
-          svg: data.svg,
-          confidence: data.confidence || 0,
-          alternatives: data.alternatives || [],
-          source: data.source || 'unknown',
-          metadata: data.metadata
-        }
-      } else {
-        toast.error('アイコンの生成に失敗しました')
-        return null
-      }
-    } catch (error) {
-      console.error('Generation error:', error)
-      toast.error('エラーが発生しました', {
-        description: error instanceof Error ? error.message : '不明なエラー'
-      })
-      return null
-    } finally {
-      setLoading(false)
-    }
-  }
+			if (data.svg) {
+				setSvg(data.svg);
+				setQuality(data.confidence || 0);
+				setAlternatives(data.alternatives || []);
+				setIconSource(data.source || "unknown");
+				setMetadata(data.metadata || null);
 
-  const selectAlternative = (alternative: Alternative) => {
-    setSvg(alternative.svg)
-    setQuality(alternative.score)
-    setIconSource(alternative.source || 'unknown')
-  }
+				return {
+					svg: data.svg,
+					confidence: data.confidence || 0,
+					alternatives: data.alternatives || [],
+					source: data.source || "unknown",
+					metadata: data.metadata,
+				};
+			}
+			toast.error("アイコンの生成に失敗しました");
+			return null;
+		} catch (error) {
+			console.error("Generation error:", error);
+			toast.error("エラーが発生しました", {
+				description: error instanceof Error ? error.message : "不明なエラー",
+			});
+			return null;
+		} finally {
+			setLoading(false);
+		}
+	};
 
-  const reset = () => {
-    setSvg('')
-    setQuality(0)
-    setAlternatives([])
-    setIconSource('')
-    setMetadata(null)
-  }
+	const selectAlternative = (alternative: Alternative) => {
+		setSvg(alternative.svg);
+		setQuality(alternative.score);
+		setIconSource(alternative.source || "unknown");
+	};
 
-  return {
-    loading,
-    svg,
-    quality,
-    alternatives,
-    iconSource,
-    metadata,
-    generate,
-    selectAlternative,
-    reset,
-    setSvg
-  }
+	const reset = () => {
+		setSvg("");
+		setQuality(0);
+		setAlternatives([]);
+		setIconSource("");
+		setMetadata(null);
+	};
+
+	return {
+		loading,
+		svg,
+		quality,
+		alternatives,
+		iconSource,
+		metadata,
+		generate,
+		selectAlternative,
+		reset,
+		setSvg,
+	};
 }

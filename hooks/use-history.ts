@@ -1,47 +1,49 @@
-import { useState, useEffect } from 'react'
-import { HistoryItem } from '@/types'
+import type { HistoryItem } from "@/types";
+import { useEffect, useState } from "react";
 
-const STORAGE_KEY = 'icons'
-const MAX_HISTORY_ITEMS = 20
+const STORAGE_KEY = "icons";
+const MAX_HISTORY_ITEMS = 20;
 
 export function useHistory() {
-  const [history, setHistory] = useState<HistoryItem[]>([])
+	const [history, setHistory] = useState<HistoryItem[]>([]);
 
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) {
-      try {
-        setHistory(JSON.parse(saved))
-      } catch (e) {
-        console.error('Failed to parse history:', e)
-      }
-    }
-  }, [])
+	useEffect(() => {
+		const saved = localStorage.getItem(STORAGE_KEY);
+		if (saved) {
+			try {
+				setHistory(JSON.parse(saved));
+			} catch (e) {
+				console.error("Failed to parse history:", e);
+			}
+		}
+	}, []);
 
-  const addToHistory = (prompt: string, svg: string) => {
-    const newItem: HistoryItem = {
-      prompt,
-      svg,
-      date: new Date().toISOString()
-    }
+	const addToHistory = (prompt: string, svg: string) => {
+		const newItem: HistoryItem = {
+			prompt,
+			svg,
+			date: new Date().toISOString(),
+		};
 
-    const newHistory = [
-      newItem,
-      ...history.filter(item => item.svg !== svg).slice(0, MAX_HISTORY_ITEMS - 1)
-    ]
+		const newHistory = [
+			newItem,
+			...history
+				.filter((item) => item.svg !== svg)
+				.slice(0, MAX_HISTORY_ITEMS - 1),
+		];
 
-    setHistory(newHistory)
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newHistory))
-  }
+		setHistory(newHistory);
+		localStorage.setItem(STORAGE_KEY, JSON.stringify(newHistory));
+	};
 
-  const clearHistory = () => {
-    setHistory([])
-    localStorage.removeItem(STORAGE_KEY)
-  }
+	const clearHistory = () => {
+		setHistory([]);
+		localStorage.removeItem(STORAGE_KEY);
+	};
 
-  return {
-    history,
-    addToHistory,
-    clearHistory
-  }
+	return {
+		history,
+		addToHistory,
+		clearHistory,
+	};
 }
