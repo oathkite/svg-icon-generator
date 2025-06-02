@@ -1,10 +1,5 @@
 import { useState, useEffect } from 'react'
-
-export interface HistoryItem {
-  prompt: string
-  svg: string
-  date: string
-}
+import { HistoryItem } from '@/types'
 
 const STORAGE_KEY = 'icons'
 const MAX_HISTORY_ITEMS = 20

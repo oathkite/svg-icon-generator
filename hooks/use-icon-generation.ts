@@ -1,24 +1,6 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-export interface IconMetadata {
-  collection?: string
-  name?: string
-}
-
-export interface GenerationResult {
-  svg: string
-  confidence: number
-  alternatives: Alternative[]
-  source: string
-  metadata?: IconMetadata
-}
-
-export interface Alternative {
-  svg: string
-  score: number
-  source?: string
-}
+import { IconMetadata, GenerationResult, Alternative } from '@/types'
 
 export function useIconGeneration() {
   const [loading, setLoading] = useState(false)

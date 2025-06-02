@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import {
   ResizablePanelGroup,
   ResizablePanel,
@@ -22,142 +22,33 @@ import {
 import { DownloadIcon } from "@radix-ui/react-icons"
 import { SvgIcon } from "@/components/svg-icon"
 import { toast } from "sonner"
-
-interface HistoryItem {
-  prompt: string
-  svg: string
-  date: string
-}
-
-interface IconMetadata {
-  collection?: string
-  name?: string
-}
+import { useHistory } from '@/hooks/use-history'
+import { useIconGeneration } from '@/hooks/use-icon-generation'
+import { downloadSVG } from '@/lib/download-utils'
+import { formatSVG, normalizeSVG } from '@/lib/svg-utils'
 
 export default function IconGenerator() {
   const [prompt, setPrompt] = useState('')
-  const [svg, setSvg] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [history, setHistory] = useState<HistoryItem[]>([])
-  const [alternatives, setAlternatives] = useState<{svg: string, score: number, source?: string}[]>([])
-  const [quality, setQuality] = useState(0)
-  const [iconSource, setIconSource] = useState<string>('')
-  const [metadata, setMetadata] = useState<IconMetadata | null>(null)
+  const { history, addToHistory } = useHistory()
+  const {
+    loading,
+    svg,
+    quality,
+    alternatives,
+    iconSource,
+    metadata,
+    generate,
+    selectAlternative,
+    setSvg
+  } = useIconGeneration()
 
-  useEffect(() => {
-    const saved = localStorage.getItem('icons')
-    if (saved) {
-      setHistory(JSON.parse(saved))
-    }
-  }, [])
-
-  const generate = async () => {
-    if (!prompt.trim()) return
-    
-    setLoading(true)
-    try {
-      const res = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt }),
-      })
-      
-      const data = await res.json()
-      
-      if (data.svg) {
-        setSvg(data.svg)
-        setQuality(data.confidence || 0)
-        setAlternatives(data.alternatives || [])
-        setIconSource(data.source || 'unknown')
-        setMetadata(data.metadata || null)
-        
-        const newHistory = [
-          { prompt, svg: data.svg, date: new Date().toISOString() },
-          ...history.slice(0, 19),
-        ]
-        setHistory(newHistory)
-        localStorage.setItem('icons', JSON.stringify(newHistory))
-      }
-    } catch (error) {
-      console.error('Generation error:', error)
-    } finally {
-      setLoading(false)
+  const handleGenerate = async () => {
+    const result = await generate(prompt)
+    if (result) {
+      addToHistory(prompt, result.svg)
     }
   }
 
-  const downloadSVG = (size: number) => {
-    const svgWithSize = svg
-      .replace(/width="\d+"/, `width="${size}"`)
-      .replace(/height="\d+"/, `height="${size}"`)
-      .replace(/currentColor/g, '#000000')
-    
-    const blob = new Blob([svgWithSize], { type: 'image/svg+xml' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `icon-${size}x${size}.svg`
-    a.click()
-    URL.revokeObjectURL(url)
-  }
-
-  const formatSVG = (svgString: string): string => {
-    // Parse and format SVG with proper indentation
-    const parser = new DOMParser()
-    const doc = parser.parseFromString(svgString, 'image/svg+xml')
-    
-    // Format with indentation
-    const formatNode = (node: Node, indent: string = ''): string => {
-      if (node.nodeType === Node.TEXT_NODE) {
-        return node.textContent?.trim() || ''
-      }
-      
-      if (node.nodeType !== Node.ELEMENT_NODE) {
-        return ''
-      }
-      
-      const element = node as Element
-      let result = `${indent}<${element.tagName.toLowerCase()}`
-      
-      // Add attributes
-      for (let i = 0; i < element.attributes.length; i++) {
-        const attr = element.attributes[i]
-        result += ` ${attr.name}="${attr.value}"`
-      }
-      
-      // Check if element has children
-      const hasChildren = element.childNodes.length > 0
-      if (!hasChildren) {
-        result += ' />'
-        return result
-      }
-      
-      result += '>'
-      
-      // Process children
-      const childIndent = indent + '  '
-      let hasTextContent = false
-      
-      for (let i = 0; i < element.childNodes.length; i++) {
-        const child = element.childNodes[i]
-        if (child.nodeType === Node.TEXT_NODE && child.textContent?.trim()) {
-          hasTextContent = true
-          result += child.textContent.trim()
-        } else if (child.nodeType === Node.ELEMENT_NODE) {
-          result += '\n' + formatNode(child, childIndent)
-        }
-      }
-      
-      if (!hasTextContent && element.childNodes.length > 0) {
-        result += '\n' + indent
-      }
-      
-      result += `</${element.tagName.toLowerCase()}>`
-      return result
-    }
-    
-    const svgElement = doc.documentElement
-    return formatNode(svgElement)
-  }
 
   const copyToClipboard = (text: string) => {
     const formattedSVG = formatSVG(text)
@@ -196,12 +87,12 @@ export default function IconGenerator() {
                     type="text"
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && generate()}
+                    onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
                     placeholder="メール"
                     className="flex-1"
                   />
                   <Button
-                    onClick={generate}
+                    onClick={handleGenerate}
                     disabled={loading || !prompt.trim()}
                   >
                     {loading ? '生成中...' : '生成'}
@@ -227,7 +118,7 @@ export default function IconGenerator() {
                           title={item.prompt}
                         >
                           <SvgIcon 
-                            svg={item.svg.replace(/width="\d+"/, 'width="100%"').replace(/height="\d+"/, 'height="100%"')}
+                            svg={normalizeSVG(item.svg)}
                             className="w-full h-full [&_svg]:w-full [&_svg]:h-full [&_svg]:text-current aspect-square"
                           />
                         </Button>
@@ -295,11 +186,7 @@ export default function IconGenerator() {
                             key={`alt-${index}-${alt.score}`}
                             variant="outline"
                             size="icon"
-                            onClick={() => {
-                              setSvg(alt.svg)
-                              setQuality(alt.score)
-                              setIconSource(alt.source || 'unknown')
-                            }}
+                            onClick={() => selectAlternative(alt)}
                             className="h-16 w-16"
                             title={`スコア: ${alt.score}/100`}
                           >
@@ -331,19 +218,19 @@ export default function IconGenerator() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                      <DropdownMenuItem onClick={() => downloadSVG(16)}>
+                      <DropdownMenuItem onClick={() => downloadSVG(svg, 16)}>
                         16×16px
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => downloadSVG(24)}>
+                      <DropdownMenuItem onClick={() => downloadSVG(svg, 24)}>
                         24×24px
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => downloadSVG(32)}>
+                      <DropdownMenuItem onClick={() => downloadSVG(svg, 32)}>
                         32×32px
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => downloadSVG(48)}>
+                      <DropdownMenuItem onClick={() => downloadSVG(svg, 48)}>
                         48×48px
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => downloadSVG(64)}>
+                      <DropdownMenuItem onClick={() => downloadSVG(svg, 64)}>
                         64×64px
                       </DropdownMenuItem>
                     </DropdownMenuContent>

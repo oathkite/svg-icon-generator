@@ -1,4 +1,17 @@
-import { getIcons, type IconifyJSON } from '@iconify/utils'
+import { getIcons } from '@iconify/utils'
+
+interface IconifyJSON {
+  prefix: string
+  icons: {
+    [key: string]: {
+      body: string
+      width?: number
+      height?: number
+    }
+  }
+  width?: number
+  height?: number
+}
 
 // 人気のアイコンコレクション
 export const iconCollections = [

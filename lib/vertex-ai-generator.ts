@@ -164,7 +164,30 @@ Vector-style illustration, high contrast.`
         source: 'vertex-ai',
         confidence: 85,
         base64Image // クライアントサイドでの変換用
-      }\n    }\n    \n    // フォールバック: シンプルなSVGパターンを生成\n    const fallbackSVG = this.generateFallbackSVG(prompt)\n    if (fallbackSVG) {\n      return {\n        svg: fallbackSVG,\n        source: 'fallback',\n        confidence: 40\n      }\n    }\n    \n    return null\n  }\n  \n  private createPlaceholderSVG(prompt: string): string {\n    // Vertex AI画像が生成されたが、SVG変換待ちの場合のプレースホルダー\n    return `<svg viewBox=\"0 0 24 24\" width=\"24\" height=\"24\" xmlns=\"http://www.w3.org/2000/svg\">\n      <rect x=\"2\" y=\"2\" width=\"20\" height=\"20\" rx=\"2\" stroke=\"currentColor\" stroke-width=\"2\" fill=\"none\"/>\n      <path d=\"M8 12h8M12 8v8\" stroke=\"currentColor\" stroke-width=\"2\" fill=\"none\"/>\n      <text x=\"12\" y=\"20\" text-anchor=\"middle\" font-size=\"6\" fill=\"currentColor\">AI</text>\n    </svg>`\n  }
+      }
+    }
+    
+    // フォールバック: シンプルなSVGパターンを生成
+    const fallbackSVG = this.generateFallbackSVG(prompt)
+    if (fallbackSVG) {
+      return {
+        svg: fallbackSVG,
+        source: 'fallback',
+        confidence: 40
+      }
+    }
+    
+    return null
+  }
+  
+  private createPlaceholderSVG(prompt: string): string {
+    // Vertex AI画像が生成されたが、SVG変換待ちの場合のプレースホルダー
+    return `<svg viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="2" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
+      <path d="M8 12h8M12 8v8" stroke="currentColor" stroke-width="2" fill="none"/>
+      <text x="12" y="20" text-anchor="middle" font-size="6" fill="currentColor">AI</text>
+    </svg>`
+  }
   
   private generateFallbackSVG(prompt: string): string | null {
     // 基本的なフォールバックSVGパターン
