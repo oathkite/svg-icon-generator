@@ -50,7 +50,10 @@ class IconGenerationService {
 		return this.generateFallbackResult(prompt);
 	}
 
-	private async generateWithOpenAI(prompt: string, iconStyle?: string): Promise<GenerationResult | null> {
+	private async generateWithOpenAI(
+		prompt: string,
+		iconStyle?: string,
+	): Promise<GenerationResult | null> {
 		try {
 			const response = await fetch("/api/generate-icon", {
 				method: "POST",
@@ -65,11 +68,11 @@ class IconGenerationService {
 			}
 
 			const result = await response.json();
-			
+
 			if (!result.svg) {
 				return null;
 			}
-			
+
 			return {
 				svg: formatSVG(result.svg),
 				confidence: result.confidence,

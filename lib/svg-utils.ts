@@ -19,7 +19,7 @@ const SVG_COLORS = {
  * Validates if a string contains valid SVG content
  */
 export const isValidSVG = (svgString: string): boolean => {
-	if (!svgString || typeof svgString !== 'string' || !svgString.trim()) return false;
+	if (!svgString || typeof svgString !== "string" || !svgString.trim()) return false;
 
 	try {
 		const parser = new DOMParser();

@@ -155,7 +155,13 @@ export default function IconGenerator() {
 
 					<div className="flex-1 overflow-auto">
 						<div className="h-full p-6">
-							{loading ? <LoadingState /> : svg ? <IconPreview svg={svg} metadata={metadata} /> : <EmptyState />}
+							{loading ? (
+								<LoadingState />
+							) : svg ? (
+								<IconPreview svg={svg} metadata={metadata} />
+							) : (
+								<EmptyState />
+							)}
 						</div>
 					</div>
 				</main>

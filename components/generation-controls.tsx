@@ -1,9 +1,9 @@
 "use client";
 
+import { StyleCombobox } from "@/components/style-combobox";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { StyleCombobox } from "@/components/style-combobox";
 import type { IconStyle } from "@/types";
 
 interface GenerationControlsProps {
@@ -45,10 +45,7 @@ export function GenerationControls({
 
 			<div className="space-y-2">
 				<Label htmlFor="icon-style">Style</Label>
-				<StyleCombobox 
-					value={iconStyle} 
-					onValueChange={onIconStyleChange}
-				/>
+				<StyleCombobox value={iconStyle} onValueChange={onIconStyleChange} />
 			</div>
 
 			<div className="space-y-2">
