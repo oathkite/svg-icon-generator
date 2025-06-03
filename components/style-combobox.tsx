@@ -19,16 +19,15 @@ import {
 } from "@/components/ui/popover"
 
 const presetStyles = [
-  { value: "auto", label: "自動" },
-  { value: "fontawesome", label: "Font Awesome風" },
-  { value: "feather", label: "Feather風" },
-  { value: "material", label: "Material Symbols風" },
-  { value: "tabler", label: "Tabler Icons風" },
-  { value: "heroicons", label: "Heroicons風" },
-  { value: "phosphor", label: "Phosphor Icons風" },
-  { value: "lucide", label: "Lucide Icons風" },
-  { value: "ionicons", label: "Ionicons風" },
-  { value: "bootstrap", label: "Bootstrap Icons風" },
+  { value: "fontawesome", label: "FontAwesome" },
+  { value: "feather", label: "Feather" },
+  { value: "material", label: "Material Symbols" },
+  { value: "tabler", label: "Tabler" },
+  { value: "heroicons", label: "Heroicons" },
+  { value: "phosphor", label: "Phosphor" },
+  { value: "lucide", label: "Lucide" },
+  { value: "ionicons", label: "Ionicons" },
+  { value: "bootstrap", label: "Bootstrap" },
 ]
 
 interface StyleComboboxProps {
