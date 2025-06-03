@@ -4,14 +4,36 @@ import sharp from "sharp";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// Dynamic import to avoid bundling issues
-const getPotrace = async () => {
-	const potrace = await import("potrace");
-	return potrace.default || potrace;
-};
+// Load potrace using dynamic require to avoid bundling issues
+interface PotraceModule {
+	trace: (
+		buffer: Buffer,
+		options: {
+			threshold?: number;
+			color?: string;
+			background?: string;
+			turdSize?: number;
+			optTolerance?: number;
+			turnPolicy?: string;
+			alphamax?: number;
+		},
+		callback: (err: Error | null, svg: string) => void,
+	) => void;
+}
+
+let potrace: PotraceModule | undefined;
+try {
+	potrace = require("potrace") as PotraceModule;
+} catch (error) {
+	console.error("Failed to load potrace:", error);
+}
 
 export async function POST(request: NextRequest) {
 	try {
+		if (!potrace) {
+			return NextResponse.json({ error: "Image tracing library not available" }, { status: 500 });
+		}
+
 		const { imageUrl, options = {} } = await request.json();
 
 		if (!imageUrl) {
@@ -38,9 +60,6 @@ export async function POST(request: NextRequest) {
 			.normalise() // Enhance contrast
 			.png()
 			.toBuffer();
-
-		// Get potrace dynamically
-		const potrace = await getPotrace();
 
 		// Trace the image
 		const svg = await new Promise<string>((resolve, reject) => {

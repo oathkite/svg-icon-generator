@@ -11,9 +11,11 @@ class IconGenerationService {
 		// まずOpenAI APIで画像生成を試みる
 		try {
 			const result = await this.generateWithOpenAI(prompt, iconStyle);
+			console.log("OpenAI result:", result);
 			if (result) {
 				return result;
 			}
+			console.log("OpenAI returned null, falling back");
 		} catch (error) {
 			console.error("OpenAI generation error:", error);
 		}
@@ -63,22 +65,27 @@ class IconGenerationService {
 				body: JSON.stringify({ prompt, iconStyle }),
 			});
 
+			console.log("Response status:", response.ok);
 			if (!response.ok) {
 				return null;
 			}
 
 			const result = await response.json();
+			console.log("API result:", result);
 
 			if (!result.svg) {
+				console.log("No SVG in result");
 				return null;
 			}
 
-			return {
+			const generationResult = {
 				svg: formatSVG(result.svg),
 				confidence: result.confidence,
 				source: result.source,
 				metadata: result.metadata,
 			};
+			console.log("Returning generation result:", generationResult);
+			return generationResult;
 		} catch (error) {
 			console.error("OpenAI API error:", error);
 			return null;

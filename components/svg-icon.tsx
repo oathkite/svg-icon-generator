@@ -67,7 +67,9 @@ const SvgIconComponent = ({ svg, className, style }: SvgIconProps) => {
 		}
 
 		// Apply to all child elements recursively
-		Array.from(element.children).forEach((child) => applyCurrentColor(child));
+		for (const child of Array.from(element.children)) {
+			applyCurrentColor(child);
+		}
 	}, []);
 
 	useEffect(() => {

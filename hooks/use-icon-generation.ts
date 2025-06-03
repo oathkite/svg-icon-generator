@@ -9,7 +9,7 @@ export function useIconGeneration() {
 	const [svg, setSvg] = useState("");
 	const [iconSource, setIconSource] = useState<string>("");
 	const [metadata, setMetadata] = useState<IconMetadata | null>(null);
-	const [iconStyle, setIconStyle] = useState<IconStyle>("auto");
+	const [iconStyle, setIconStyle] = useState<IconStyle>("fontawesome");
 
 	const generate = async (prompt: string): Promise<GenerationResult | null> => {
 		if (!prompt.trim()) {
