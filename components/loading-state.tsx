@@ -12,12 +12,8 @@ export function LoadingState() {
 							<div className="w-12 h-12 mx-auto border-4 border-primary border-t-transparent rounded-full animate-spin" />
 						</div>
 						<div>
-							<p className="text-sm text-muted-foreground">
-								生成中
-							</p>
-							<p className="text-xs text-muted-foreground mt-1">
-								AIがアイコンを作成しています...
-							</p>
+							<p className="text-sm text-muted-foreground">生成中</p>
+							<p className="text-xs text-muted-foreground mt-1">AIがアイコンを作成しています...</p>
 						</div>
 					</div>
 				</CardContent>

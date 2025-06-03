@@ -1,7 +1,6 @@
 "use client";
 
 import { EmptyState } from "@/components/empty-state";
-import { APP_VERSION } from "@/lib/version";
 import { GenerationControls } from "@/components/generation-controls";
 import { HistoryGrid } from "@/components/history-grid";
 import { IconPreview } from "@/components/icon-preview";
@@ -14,10 +13,6 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { downloadSVG } from "@/lib/download-utils";
-import { formatSVG } from "@/lib/svg-utils";
-import { DownloadIcon } from "@radix-ui/react-icons";
-import { toast } from "sonner";
 import {
 	Sidebar,
 	SidebarContent,
@@ -28,20 +23,18 @@ import {
 } from "@/components/ui/sidebar";
 import { useHistory } from "@/hooks/use-history";
 import { useIconGeneration } from "@/hooks/use-icon-generation";
+import { downloadSVG } from "@/lib/download-utils";
+import { formatSVG } from "@/lib/svg-utils";
+import { APP_VERSION } from "@/lib/version";
 import type { HistoryItem } from "@/types";
+import { DownloadIcon } from "@radix-ui/react-icons";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function IconGenerator() {
 	const [prompt, setPrompt] = useState("");
 	const { history, addToHistory, clearHistory } = useHistory();
-	const {
-		loading,
-		svg,
-		iconStyle,
-		generate,
-		setSvg,
-		setIconStyle,
-	} = useIconGeneration();
+	const { loading, svg, iconStyle, generate, setSvg, setIconStyle } = useIconGeneration();
 
 	const handleGenerate = async () => {
 		const result = await generate(prompt);
@@ -71,9 +64,11 @@ export default function IconGenerator() {
 
 	return (
 		<SidebarProvider
-			style={{
-				"--sidebar-width": "20rem",
-			} as React.CSSProperties}
+			style={
+				{
+					"--sidebar-width": "20rem",
+				} as React.CSSProperties
+			}
 		>
 			<div className="flex h-screen w-full">
 				<Sidebar>
@@ -88,7 +83,7 @@ export default function IconGenerator() {
 							<ThemeToggle />
 						</div>
 					</SidebarHeader>
-					
+
 					<SidebarContent className="px-6 py-6">
 						<div className="space-y-6">
 							<GenerationControls
@@ -110,9 +105,7 @@ export default function IconGenerator() {
 					</SidebarContent>
 
 					<SidebarFooter className="border-t px-6 py-4">
-						<div className="text-xs text-muted-foreground text-center">
-							Pictogen v{APP_VERSION}
-						</div>
+						<div className="text-xs text-muted-foreground text-center">Pictogen v{APP_VERSION}</div>
 					</SidebarFooter>
 				</Sidebar>
 
@@ -128,11 +121,7 @@ export default function IconGenerator() {
 						</div>
 						{svg && (
 							<div className="flex gap-2">
-								<Button
-									variant="secondary"
-									size="sm"
-									onClick={() => copyToClipboard(svg)}
-								>
+								<Button variant="secondary" size="sm" onClick={() => copyToClipboard(svg)}>
 									Copy SVG
 								</Button>
 								<DropdownMenu>
@@ -166,13 +155,7 @@ export default function IconGenerator() {
 
 					<div className="flex-1 overflow-auto">
 						<div className="h-full p-6">
-							{loading ? (
-								<LoadingState />
-							) : svg ? (
-								<IconPreview svg={svg} />
-							) : (
-								<EmptyState />
-							)}
+							{loading ? <LoadingState /> : svg ? <IconPreview svg={svg} /> : <EmptyState />}
 						</div>
 					</div>
 				</main>

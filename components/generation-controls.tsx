@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
 	Select,
 	SelectContent,
@@ -10,6 +9,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import type { IconStyle } from "@/types";
 
 interface GenerationControlsProps {
@@ -51,10 +51,7 @@ export function GenerationControls({
 
 			<div className="space-y-2">
 				<Label htmlFor="icon-style">Style</Label>
-				<Select
-					value={iconStyle}
-					onValueChange={(value: IconStyle) => onIconStyleChange(value)}
-				>
+				<Select value={iconStyle} onValueChange={(value: IconStyle) => onIconStyleChange(value)}>
 					<SelectTrigger id="icon-style">
 						<SelectValue placeholder="スタイルを選択" />
 					</SelectTrigger>
@@ -68,16 +65,10 @@ export function GenerationControls({
 			</div>
 
 			<div className="space-y-2">
-				<Button
-					onClick={onGenerate}
-					disabled={loading || !prompt.trim()}
-					className="w-full"
-				>
+				<Button onClick={onGenerate} disabled={loading || !prompt.trim()} className="w-full">
 					{loading ? "生成中..." : "生成"}
 				</Button>
-				<p className="text-xs text-muted-foreground text-center">
-					Ctrl + Enter で生成
-				</p>
+				<p className="text-xs text-muted-foreground text-center">Ctrl + Enter で生成</p>
 			</div>
 		</div>
 	);

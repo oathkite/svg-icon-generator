@@ -66,9 +66,7 @@ export function HistoryGrid({
 							</AlertDialogHeader>
 							<AlertDialogFooter>
 								<AlertDialogCancel>キャンセル</AlertDialogCancel>
-								<AlertDialogAction onClick={handleClearHistory}>
-									クリア
-								</AlertDialogAction>
+								<AlertDialogAction onClick={handleClearHistory}>クリア</AlertDialogAction>
 							</AlertDialogFooter>
 						</AlertDialogContent>
 					</AlertDialog>
@@ -82,9 +80,7 @@ export function HistoryGrid({
 								variant="outline"
 								onClick={() => onSelectItem(item)}
 								className={`w-full aspect-square p-3 min-h-[58px] ${
-									isActive
-										? "ring-2 ring-primary"
-										: "hover:bg-secondary border-border"
+									isActive ? "ring-2 ring-primary" : "hover:bg-secondary border-border"
 								}`}
 								title={item.prompt}
 							>

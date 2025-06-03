@@ -1,10 +1,6 @@
-import type {
-	GenerationResult,
-	IconMetadata,
-	IconStyle,
-} from "@/types";
 import { iconGenerator } from "@/lib/icon-generator";
 import { formatSVG } from "@/lib/svg-utils";
+import type { GenerationResult, IconMetadata, IconStyle } from "@/types";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -53,7 +49,6 @@ export function useIconGeneration() {
 			setLoading(false);
 		}
 	};
-
 
 	const reset = () => {
 		setSvg("");

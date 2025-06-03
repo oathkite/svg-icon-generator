@@ -14,7 +14,7 @@ const SvgIconComponent = ({ svg, className, style }: SvgIconProps) => {
 	// Memoize the processed SVG to avoid repeated parsing
 	const processedSvg = useMemo(() => {
 		if (!svg) return null;
-		
+
 		try {
 			// Create a temporary container to parse the SVG
 			const temp = document.createElement("div");
@@ -30,7 +30,7 @@ const SvgIconComponent = ({ svg, className, style }: SvgIconProps) => {
 			// Force 100% width and height for responsive scaling
 			clonedSvg.setAttribute("width", "100%");
 			clonedSvg.setAttribute("height", "100%");
-			
+
 			// Ensure proper aspect ratio preservation
 			if (!clonedSvg.getAttribute("viewBox")) {
 				// If no viewBox, create one based on original width/height or default to 24x24
@@ -38,7 +38,7 @@ const SvgIconComponent = ({ svg, className, style }: SvgIconProps) => {
 				const originalHeight = svgElement.getAttribute("height") || "24";
 				clonedSvg.setAttribute("viewBox", `0 0 ${originalWidth} ${originalHeight}`);
 			}
-			
+
 			// Set preserveAspectRatio for 1:1 aspect ratio
 			clonedSvg.setAttribute("preserveAspectRatio", "xMidYMid meet");
 
@@ -52,11 +52,11 @@ const SvgIconComponent = ({ svg, className, style }: SvgIconProps) => {
 	// Memoized function to apply current color styling
 	const applyCurrentColor = useCallback((element: Element) => {
 		const el = element as HTMLElement;
-		
+
 		// Set stroke to none and fill to currentColor
 		element.setAttribute("stroke", "none");
 		element.setAttribute("fill", "currentColor");
-		
+
 		// Override inline styles
 		if (el.style) {
 			el.style.stroke = "none";
@@ -65,9 +65,9 @@ const SvgIconComponent = ({ svg, className, style }: SvgIconProps) => {
 				el.style.color = "currentColor";
 			}
 		}
-		
+
 		// Apply to all child elements recursively
-		Array.from(element.children).forEach(child => applyCurrentColor(child));
+		Array.from(element.children).forEach((child) => applyCurrentColor(child));
 	}, []);
 
 	useEffect(() => {
@@ -78,7 +78,7 @@ const SvgIconComponent = ({ svg, className, style }: SvgIconProps) => {
 
 		// Clone again for DOM insertion (to avoid issues with multiple instances)
 		const svgForDom = processedSvg.cloneNode(true) as SVGElement;
-		
+
 		// Apply currentColor to the SVG and all its children
 		applyCurrentColor(svgForDom);
 

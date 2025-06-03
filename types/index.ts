@@ -16,9 +16,4 @@ export interface GenerationResult {
 	metadata?: IconMetadata;
 }
 
-export type IconStyle =
-	| "auto"
-	| "fontawesome"
-	| "feather"
-	| "material";
-
+export type IconStyle = "auto" | "fontawesome" | "feather" | "material";

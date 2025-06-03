@@ -27,9 +27,7 @@ export function useHistory() {
 
 		const newHistory = [
 			newItem,
-			...history
-				.filter((item) => item.svg !== svg)
-				.slice(0, MAX_HISTORY_ITEMS - 1),
+			...history.filter((item) => item.svg !== svg).slice(0, MAX_HISTORY_ITEMS - 1),
 		];
 
 		setHistory(newHistory);

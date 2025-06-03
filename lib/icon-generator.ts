@@ -3,27 +3,24 @@ import { findMatchingPattern, iconPatterns } from "./icon-patterns";
 import { formatSVG, isValidSVG } from "./svg-utils";
 
 class IconGenerationService {
-	async generateIcon(
-		prompt: string,
-		_iconStyle?: string,
-	): Promise<GenerationResult> {
+	async generateIcon(prompt: string, _iconStyle?: string): Promise<GenerationResult> {
 		if (!prompt.trim()) {
 			throw new Error("プロンプトが空です");
 		}
 
 		// パターンマッチングでアイコンを検索
 		const matchedPattern = findMatchingPattern(prompt);
-		
+
 		if (matchedPattern) {
 			try {
 				// Validate SVG before processing
 				if (!isValidSVG(matchedPattern.svg)) {
 					throw new Error("パターンのSVGが無効です");
 				}
-				
+
 				// メインの結果
 				const formattedSvg = formatSVG(matchedPattern.svg);
-				
+
 				return {
 					svg: formattedSvg,
 					confidence: 0.95,
@@ -43,10 +40,9 @@ class IconGenerationService {
 		return this.generateFallbackResult(prompt);
 	}
 
-
 	private generateFallbackResult(_prompt: string): GenerationResult {
 		// 汎用的なアイコンまたは最も近いマッチを返す
-		const fallbackPattern = iconPatterns.find(p => p.name === "info") || iconPatterns[0];
+		const fallbackPattern = iconPatterns.find((p) => p.name === "info") || iconPatterns[0];
 
 		return {
 			svg: formatSVG(fallbackPattern.svg),
@@ -58,7 +54,6 @@ class IconGenerationService {
 			},
 		};
 	}
-
 }
 
 export const iconGenerator = new IconGenerationService();
