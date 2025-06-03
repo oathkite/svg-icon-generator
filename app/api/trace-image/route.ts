@@ -4,7 +4,7 @@ import sharp from "sharp";
 
 export async function POST(request: NextRequest) {
   try {
-    const { imageUrl } = await request.json();
+    const { imageUrl, options = {} } = await request.json();
 
     if (!imageUrl) {
       return NextResponse.json(
@@ -37,11 +37,13 @@ export async function POST(request: NextRequest) {
     // Trace the image
     const svg = await new Promise<string>((resolve, reject) => {
       potrace.trace(buffer, {
-        threshold: 128,
+        threshold: options.threshold || 128,
         color: "currentColor",
         background: "transparent",
-        turdSize: 10,
-        optTolerance: 0.2,
+        turdSize: options.turdSize || 2,
+        optTolerance: options.optTolerance || 0.2,
+        turnPolicy: potrace.Potrace.TURNPOLICY_MINORITY,
+        alphamax: 1,
       }, (err, svg) => {
         if (err) {
           reject(err);
