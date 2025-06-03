@@ -12,25 +12,13 @@ export interface HistoryItem {
 export interface GenerationResult {
 	svg: string;
 	confidence: number;
-	alternatives: Alternative[];
 	source: string;
 	metadata?: IconMetadata;
 }
 
-export interface Alternative {
-	svg: string;
-	score: number;
-	source?: string;
-}
+export type IconStyle =
+	| "auto"
+	| "fontawesome"
+	| "feather"
+	| "material";
 
-export interface IconGenerationRequest {
-	prompt: string;
-}
-
-export interface IconGenerationResponse {
-	svg: string;
-	confidence: number;
-	alternatives: Alternative[];
-	source: string;
-	metadata?: IconMetadata;
-}

@@ -6,8 +6,8 @@ import { Toaster } from "sonner";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-	title: "SVG Icon Generator",
-	description: "Generate SVG icons from text prompts",
+	title: "Pictogen - AI Pictogram Generator",
+	description: "AI powered pictogram generator - Create custom SVG icons with simple text prompts",
 };
 
 export default function RootLayout({

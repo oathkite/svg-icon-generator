@@ -1,4 +1,7 @@
-# Project Guidelines for Claude
+# Pictogen - Project Guidelines for Claude
+
+## About Pictogen
+Pictogen is an AI-powered pictogram generator that creates custom SVG icons from simple text prompts. Built with Next.js, TypeScript, and modern UI components.
 
 ## UI Component Standards
 

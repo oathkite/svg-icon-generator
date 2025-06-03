@@ -1,14 +1,19 @@
-import type { Alternative, GenerationResult, IconMetadata } from "@/types";
+import type {
+	GenerationResult,
+	IconMetadata,
+	IconStyle,
+} from "@/types";
+import { iconGenerator } from "@/lib/icon-generator";
+import { formatSVG } from "@/lib/svg-utils";
 import { useState } from "react";
 import { toast } from "sonner";
 
 export function useIconGeneration() {
 	const [loading, setLoading] = useState(false);
 	const [svg, setSvg] = useState("");
-	const [quality, setQuality] = useState(0);
-	const [alternatives, setAlternatives] = useState<Alternative[]>([]);
 	const [iconSource, setIconSource] = useState<string>("");
 	const [metadata, setMetadata] = useState<IconMetadata | null>(null);
+	const [iconStyle, setIconStyle] = useState<IconStyle>("auto");
 
 	const generate = async (prompt: string): Promise<GenerationResult | null> => {
 		if (!prompt.trim()) {
@@ -19,34 +24,24 @@ export function useIconGeneration() {
 		setLoading(true);
 
 		try {
-			const response = await fetch("/api/generate", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ prompt }),
-			});
+			const result = await iconGenerator.generateIcon(prompt, iconStyle);
 
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
-			}
-
-			const data = await response.json();
-
-			if (data.svg) {
-				setSvg(data.svg);
-				setQuality(data.confidence || 0);
-				setAlternatives(data.alternatives || []);
-				setIconSource(data.source || "unknown");
-				setMetadata(data.metadata || null);
+			if (result?.svg) {
+				const formattedSvg = formatSVG(result.svg);
+				setSvg(formattedSvg);
+				setIconSource(result.source || "unknown");
+				setMetadata(null); // メタデータは不要になった
 
 				return {
-					svg: data.svg,
-					confidence: data.confidence || 0,
-					alternatives: data.alternatives || [],
-					source: data.source || "unknown",
-					metadata: data.metadata,
+					svg: formattedSvg,
+					confidence: result.confidence || 0,
+					source: result.source || "unknown",
+					metadata: undefined,
 				};
 			}
-			toast.error("アイコンの生成に失敗しました");
+			toast.error("アイコンの生成に失敗しました", {
+				description: "別のキーワードやスタイルで再度お試しください。",
+			});
 			return null;
 		} catch (error) {
 			console.error("Generation error:", error);
@@ -59,16 +54,9 @@ export function useIconGeneration() {
 		}
 	};
 
-	const selectAlternative = (alternative: Alternative) => {
-		setSvg(alternative.svg);
-		setQuality(alternative.score);
-		setIconSource(alternative.source || "unknown");
-	};
 
 	const reset = () => {
 		setSvg("");
-		setQuality(0);
-		setAlternatives([]);
 		setIconSource("");
 		setMetadata(null);
 	};
@@ -76,13 +64,12 @@ export function useIconGeneration() {
 	return {
 		loading,
 		svg,
-		quality,
-		alternatives,
 		iconSource,
 		metadata,
+		iconStyle,
 		generate,
-		selectAlternative,
 		reset,
 		setSvg,
+		setIconStyle,
 	};
 }
