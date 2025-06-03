@@ -9,12 +9,17 @@ declare module 'potrace' {
     alphamax?: number;
   }
 
-  export const Potrace: {
-    TURNPOLICY_MINORITY: string;
-    TURNPOLICY_MAJORITY: string;
-    TURNPOLICY_LEFT: string;
-    TURNPOLICY_RIGHT: string;
-  };
+  export class Potrace {
+    static TURNPOLICY_MINORITY: string;
+    static TURNPOLICY_MAJORITY: string;
+    static TURNPOLICY_LEFT: string;
+    static TURNPOLICY_RIGHT: string;
+    
+    constructor();
+    setParameters(options: Partial<PotraceOptions>): void;
+    loadImage(buffer: Buffer, callback: (err: Error | null) => void): void;
+    getSVG(): string;
+  }
 
   export function trace(
     buffer: Buffer,
