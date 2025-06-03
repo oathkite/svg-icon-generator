@@ -43,7 +43,7 @@ export function StyleCombobox({ value, onValueChange }: StyleComboboxProps) {
 			<PopoverTrigger asChild>
 				<Button
 					variant="outline"
-					role="combobox"
+					aria-haspopup="listbox"
 					aria-expanded={open}
 					className="w-full justify-between"
 				>

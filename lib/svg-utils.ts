@@ -107,14 +107,14 @@ export const resizeSVG = (svg: string, size: number): string => {
 		return svg;
 	}
 
-	if (size <= 0 || size > 1024) {
+	const actualSize = size <= 0 || size > 1024 ? 24 : size;
+	if (actualSize !== size) {
 		console.warn("Invalid size provided to resizeSVG, using default 24");
-		size = 24;
 	}
 
 	return svg
-		.replace(SVG_REGEX_PATTERNS.width, `width="${size}"`)
-		.replace(SVG_REGEX_PATTERNS.height, `height="${size}"`)
+		.replace(SVG_REGEX_PATTERNS.width, `width="${actualSize}"`)
+		.replace(SVG_REGEX_PATTERNS.height, `height="${actualSize}"`)
 		.replace(SVG_REGEX_PATTERNS.fill, `fill="${SVG_COLORS.black}"`)
 		.replace(SVG_REGEX_PATTERNS.stroke, `stroke="${SVG_COLORS.none}"`)
 		.replace(SVG_REGEX_PATTERNS.currentColor, SVG_COLORS.black)
@@ -171,15 +171,17 @@ export const optimizeSVG = (svg: string): string => {
 export const createSafeSVG = (svgContent: string): string => {
 	if (!svgContent) return "";
 
+	let processedSvg = svgContent;
+
 	// Ensure SVG has proper namespace and attributes
-	if (!svgContent.includes("xmlns")) {
-		svgContent = svgContent.replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg"');
+	if (!processedSvg.includes("xmlns")) {
+		processedSvg = processedSvg.replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg"');
 	}
 
 	// Add default viewBox if missing
-	if (!svgContent.includes("viewBox")) {
-		svgContent = svgContent.replace("<svg", '<svg viewBox="0 0 24 24"');
+	if (!processedSvg.includes("viewBox")) {
+		processedSvg = processedSvg.replace("<svg", '<svg viewBox="0 0 24 24"');
 	}
 
-	return optimizeSVG(svgContent);
+	return optimizeSVG(processedSvg);
 };
