@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
         "Authorization": `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "dall-e-3",
+        model: "gpt-image-1",
         prompt: prompt,
         n: 1,
         size: "1024x1024",
@@ -43,9 +43,23 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    return NextResponse.json({
-      imageUrl: data.data[0].url,
-    })
+    // Check if response is base64 or URL
+    if (data.data[0].b64_json) {
+      // Handle base64 response
+      const base64Data = data.data[0].b64_json;
+      const imageDataUrl = `data:image/png;base64,${base64Data}`;
+      
+      return NextResponse.json({
+        imageUrl: imageDataUrl,
+      })
+    } else if (data.data[0].url) {
+      // Handle URL response
+      return NextResponse.json({
+        imageUrl: data.data[0].url,
+      })
+    } else {
+      throw new Error("Invalid response format from OpenAI")
+    }
   } catch (error) {
     console.error("Error generating image:", error)
     return NextResponse.json(

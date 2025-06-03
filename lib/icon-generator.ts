@@ -65,6 +65,11 @@ class IconGenerationService {
 			}
 
 			const result = await response.json();
+			
+			if (!result.svg) {
+				return null;
+			}
+			
 			return {
 				svg: formatSVG(result.svg),
 				confidence: result.confidence,

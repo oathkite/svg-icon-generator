@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import potrace from "potrace";
-import Jimp from "jimp";
+import sharp from "sharp";
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,17 +13,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Download and process the image
-    const image = await Jimp.read(imageUrl);
+    // Handle both URL and base64 data
+    let inputBuffer: Buffer;
     
-    // Convert to grayscale for better tracing
-    image.grayscale();
+    if (imageUrl.startsWith('data:image')) {
+      // Handle base64 data URL
+      const base64Data = imageUrl.split(',')[1];
+      inputBuffer = Buffer.from(base64Data, 'base64');
+    } else {
+      // Handle regular URL
+      const response = await fetch(imageUrl);
+      const arrayBuffer = await response.arrayBuffer();
+      inputBuffer = Buffer.from(arrayBuffer);
+    }
     
-    // Increase contrast for better edge detection
-    image.contrast(0.5);
-    
-    // Get buffer
-    const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
+    // Process the image with sharp
+    const buffer = await sharp(inputBuffer)
+      .greyscale() // Convert to grayscale
+      .normalise() // Enhance contrast
+      .png()
+      .toBuffer();
     
     // Trace the image
     const svg = await new Promise<string>((resolve, reject) => {
@@ -53,7 +62,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Image tracing error:", error);
     return NextResponse.json(
-      { error: "Failed to trace image" },
+      { error: error instanceof Error ? error.message : "Failed to trace image" },
       { status: 500 }
     );
   }

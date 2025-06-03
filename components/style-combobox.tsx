@@ -65,16 +65,24 @@ export function StyleCombobox({ value, onValueChange }: StyleComboboxProps) {
           />
           <CommandList>
             <CommandEmpty>
-              <div
-                className="px-2 py-1.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground"
+              <button
+                className="w-full text-left px-2 py-1.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground"
                 onClick={() => {
                   onValueChange(searchValue)
                   setOpen(false)
                   setSearchValue("")
                 }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault()
+                    onValueChange(searchValue)
+                    setOpen(false)
+                    setSearchValue("")
+                  }
+                }}
               >
                 "{searchValue}" を使用
-              </div>
+              </button>
             </CommandEmpty>
             <CommandGroup>
               {presetStyles.map((style) => (
