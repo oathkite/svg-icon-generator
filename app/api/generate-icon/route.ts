@@ -118,21 +118,32 @@ The icon should be designed in the style of ${styleReference} icons:
 			);
 		}
 
-		// 画像URLからSVGっぽいものを生成（実際の実装では画像をトレースする必要があります）
-		// ここでは簡易的にプレースホルダーSVGを返します
-		const placeholderSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-			<rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-			<text x="12" y="16" text-anchor="middle" font-size="10" fill="currentColor">AI</text>
-		</svg>`;
+		// PNG画像をSVGに変換
+		const imageUrl = data.data[0].url;
+		
+		// Call trace API to convert PNG to SVG
+		const traceResponse = await fetch(new URL("/api/trace-image", request.url).toString(), {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ imageUrl }),
+		});
+
+		if (!traceResponse.ok) {
+			throw new Error("Failed to trace image");
+		}
+
+		const { svg } = await traceResponse.json();
 
 		const result: GenerationResult = {
-			svg: placeholderSvg,
+			svg: svg,
 			confidence: 0.85,
 			source: "ai",
 			metadata: {
 				name: prompt,
 				collection: "openai",
-				imageUrl: data.data[0].url,
+				imageUrl: imageUrl,
 			},
 		};
 
