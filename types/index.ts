@@ -1,6 +1,7 @@
 export interface IconMetadata {
 	collection?: string;
 	name?: string;
+	imageUrl?: string;
 }
 
 export interface HistoryItem {
@@ -16,4 +17,4 @@ export interface GenerationResult {
 	metadata?: IconMetadata;
 }
 
-export type IconStyle = "auto" | "fontawesome" | "feather" | "material";
+export type IconStyle = string;

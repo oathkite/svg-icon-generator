@@ -2,14 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { StyleCombobox } from "@/components/style-combobox";
 import type { IconStyle } from "@/types";
 
 interface GenerationControlsProps {
@@ -51,17 +45,10 @@ export function GenerationControls({
 
 			<div className="space-y-2">
 				<Label htmlFor="icon-style">Style</Label>
-				<Select value={iconStyle} onValueChange={(value: IconStyle) => onIconStyleChange(value)}>
-					<SelectTrigger id="icon-style">
-						<SelectValue placeholder="スタイルを選択" />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value="auto">自動</SelectItem>
-						<SelectItem value="fontawesome">FontAwesome</SelectItem>
-						<SelectItem value="feather">Feather</SelectItem>
-						<SelectItem value="material">Material Symbol</SelectItem>
-					</SelectContent>
-				</Select>
+				<StyleCombobox 
+					value={iconStyle} 
+					onValueChange={onIconStyleChange}
+				/>
 			</div>
 
 			<div className="space-y-2">

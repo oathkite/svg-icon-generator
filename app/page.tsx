@@ -34,7 +34,7 @@ import { toast } from "sonner";
 export default function IconGenerator() {
 	const [prompt, setPrompt] = useState("");
 	const { history, addToHistory, clearHistory } = useHistory();
-	const { loading, svg, iconStyle, generate, setSvg, setIconStyle } = useIconGeneration();
+	const { loading, svg, metadata, iconStyle, generate, setSvg, setIconStyle } = useIconGeneration();
 
 	const handleGenerate = async () => {
 		const result = await generate(prompt);
@@ -155,7 +155,7 @@ export default function IconGenerator() {
 
 					<div className="flex-1 overflow-auto">
 						<div className="h-full p-6">
-							{loading ? <LoadingState /> : svg ? <IconPreview svg={svg} /> : <EmptyState />}
+							{loading ? <LoadingState /> : svg ? <IconPreview svg={svg} metadata={metadata} /> : <EmptyState />}
 						</div>
 					</div>
 				</main>

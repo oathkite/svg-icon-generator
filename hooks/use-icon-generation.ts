@@ -26,13 +26,13 @@ export function useIconGeneration() {
 				const formattedSvg = formatSVG(result.svg);
 				setSvg(formattedSvg);
 				setIconSource(result.source || "unknown");
-				setMetadata(null); // メタデータは不要になった
+				setMetadata(result.metadata || null);
 
 				return {
 					svg: formattedSvg,
 					confidence: result.confidence || 0,
 					source: result.source || "unknown",
-					metadata: undefined,
+					metadata: result.metadata,
 				};
 			}
 			toast.error("アイコンの生成に失敗しました", {

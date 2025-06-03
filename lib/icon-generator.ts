@@ -3,12 +3,22 @@ import { findMatchingPattern, iconPatterns } from "./icon-patterns";
 import { formatSVG, isValidSVG } from "./svg-utils";
 
 class IconGenerationService {
-	async generateIcon(prompt: string, _iconStyle?: string): Promise<GenerationResult> {
+	async generateIcon(prompt: string, iconStyle?: string): Promise<GenerationResult> {
 		if (!prompt.trim()) {
 			throw new Error("プロンプトが空です");
 		}
 
-		// パターンマッチングでアイコンを検索
+		// まずOpenAI APIで画像生成を試みる
+		try {
+			const result = await this.generateWithOpenAI(prompt, iconStyle);
+			if (result) {
+				return result;
+			}
+		} catch (error) {
+			console.error("OpenAI generation error:", error);
+		}
+
+		// OpenAIが失敗した場合はパターンマッチングでアイコンを検索
 		const matchedPattern = findMatchingPattern(prompt);
 
 		if (matchedPattern) {
@@ -38,6 +48,33 @@ class IconGenerationService {
 
 		// マッチしない場合は汎用アイコンと提案を返す
 		return this.generateFallbackResult(prompt);
+	}
+
+	private async generateWithOpenAI(prompt: string, iconStyle?: string): Promise<GenerationResult | null> {
+		try {
+			const response = await fetch("/api/generate-icon", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ prompt, iconStyle }),
+			});
+
+			if (!response.ok) {
+				return null;
+			}
+
+			const result = await response.json();
+			return {
+				svg: formatSVG(result.svg),
+				confidence: result.confidence,
+				source: result.source,
+				metadata: result.metadata,
+			};
+		} catch (error) {
+			console.error("OpenAI API error:", error);
+			return null;
+		}
 	}
 
 	private generateFallbackResult(_prompt: string): GenerationResult {
