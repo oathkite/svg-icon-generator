@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useHistory } from "@/hooks/use-history";
 import { useIconGeneration } from "@/hooks/use-icon-generation";
-import { downloadSVG, downloadPNG } from "@/lib/download-utils";
+import { downloadSVG } from "@/lib/download-utils";
 import { formatSVG } from "@/lib/svg-utils";
 import { APP_VERSION } from "@/lib/version";
 import type { HistoryItem } from "@/types";
@@ -128,7 +128,7 @@ export default function IconGenerator() {
 									<DropdownMenuTrigger asChild>
 										<Button size="sm">
 											<DownloadIcon />
-											SVG
+											Download
 										</Button>
 									</DropdownMenuTrigger>
 									<DropdownMenuContent>
@@ -149,13 +149,6 @@ export default function IconGenerator() {
 										</DropdownMenuItem>
 									</DropdownMenuContent>
 								</DropdownMenu>
-								<Button 
-									size="sm" 
-									onClick={() => downloadPNG(svg, 1024).catch(() => toast.error("PNGのダウンロードに失敗しました"))}
-								>
-									<DownloadIcon />
-									PNG
-								</Button>
 							</div>
 						)}
 					</header>
