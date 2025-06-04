@@ -14,54 +14,55 @@ export async function convertPngToSvgServer(
 	baseUrl: string,
 	options: ConversionOptions = {},
 ): Promise<ConversionResult> {
-	// Try the simple endpoint first (no sharp dependency)
-	const endpoints = ["/api/trace-image-simple", "/api/trace-image"];
-	
-	for (const endpoint of endpoints) {
-		try {
-			const response = await fetch(`${baseUrl}${endpoint}`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
+	try {
+		const response = await fetch(`${baseUrl}/api/trace-image`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				imageUrl,
+				options: {
+					threshold: options.threshold || 128,
+					turdSize: options.turdSize || 2,
+					optTolerance: options.optTolerance || 0.2,
 				},
-				body: JSON.stringify({
-					imageUrl,
-					options: {
-						threshold: options.threshold || 128,
-						turdSize: options.turdSize || 2,
-						optTolerance: options.optTolerance || 0.2,
-					},
-				}),
-			});
+			}),
+		});
 
-			// Check if response is JSON
-			const contentType = response.headers.get("content-type");
-			if (!contentType || !contentType.includes("application/json")) {
-				console.error(`Non-JSON response from ${endpoint}:`, contentType);
-				continue; // Try next endpoint
-			}
-
-			const data = await response.json();
-
-			if (!response.ok) {
-				console.error(`${endpoint} failed:`, data.error);
-				continue; // Try next endpoint
-			}
-
+		// Check if response is JSON
+		const contentType = response.headers.get("content-type");
+		if (!contentType || !contentType.includes("application/json")) {
+			console.error("Received non-JSON response from trace-image API:", contentType);
+			const text = await response.text();
+			console.error("Response body:", text.substring(0, 200));
 			return {
-				svg: data.svg,
-				success: true,
+				svg: "",
+				success: false,
+				error: "API endpoint returned HTML instead of JSON. Check server configuration.",
 			};
-		} catch (error) {
-			console.error(`Error with ${endpoint}:`, error);
-			continue; // Try next endpoint
 		}
+
+		const data = await response.json();
+
+		if (!response.ok) {
+			return {
+				svg: "",
+				success: false,
+				error: data.error || "SVG conversion failed",
+			};
+		}
+
+		return {
+			svg: data.svg,
+			success: true,
+		};
+	} catch (error) {
+		console.error("SVG conversion error:", error);
+		return {
+			svg: "",
+			success: false,
+			error: error instanceof Error ? error.message : "SVG conversion error occurred",
+		};
 	}
-	
-	// All endpoints failed
-	return {
-		svg: "",
-		success: false,
-		error: "All SVG conversion endpoints failed. Check server configuration.",
-	};
 }

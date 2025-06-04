@@ -3,12 +3,7 @@
  * This can be used as an alternative to avoid internal API routing issues
  */
 
-let sharp: any;
-try {
-	sharp = require("sharp");
-} catch (error) {
-	console.error("Failed to load sharp module:", error);
-}
+import sharp from "sharp";
 
 interface PotraceModule {
 	trace: (
@@ -44,11 +39,11 @@ export async function convertPngToSvgDirect(
 	options: DirectConversionOptions = {},
 ): Promise<{ svg: string; success: boolean; error?: string }> {
 	try {
-		if (!potrace || !sharp) {
+		if (!potrace) {
 			return {
 				svg: "",
 				success: false,
-				error: "Image processing libraries not available on this environment",
+				error: "Image tracing library not available",
 			};
 		}
 
