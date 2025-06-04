@@ -21,7 +21,6 @@ Pictogen is a modern web application that creates custom SVG icons using AI-powe
 - **shadcn/ui** - Modern, accessible UI components
 - **OpenAI API** - AI-powered image generation
 - **Potrace** - Bitmap to vector graphics converter
-- **Sonner** - Toast notifications
 
 ## Getting Started
 
