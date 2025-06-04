@@ -1,15 +1,9 @@
-/**
- * Direct PNG to SVG conversion without API calls
- * This can be used as an alternative to avoid internal API routing issues
- */
+import { type NextRequest, NextResponse } from "next/server";
 
-let sharp: any;
-try {
-	sharp = require("sharp");
-} catch (error) {
-	console.error("Failed to load sharp module:", error);
-}
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
+// Load potrace using dynamic require to avoid bundling issues
 interface PotraceModule {
 	trace: (
 		buffer: Buffer,
@@ -33,23 +27,16 @@ try {
 	console.error("Failed to load potrace:", error);
 }
 
-export interface DirectConversionOptions {
-	threshold?: number;
-	turdSize?: number;
-	optTolerance?: number;
-}
-
-export async function convertPngToSvgDirect(
-	imageUrl: string,
-	options: DirectConversionOptions = {},
-): Promise<{ svg: string; success: boolean; error?: string }> {
+export async function POST(request: NextRequest) {
 	try {
-		if (!potrace || !sharp) {
-			return {
-				svg: "",
-				success: false,
-				error: "Image processing libraries not available on this environment",
-			};
+		if (!potrace) {
+			return NextResponse.json({ error: "Image tracing library not available" }, { status: 500 });
+		}
+
+		const { imageUrl, options = {} } = await request.json();
+
+		if (!imageUrl) {
+			return NextResponse.json({ error: "Image URL is required" }, { status: 400 });
 		}
 
 		// Handle both URL and base64 data
@@ -66,17 +53,10 @@ export async function convertPngToSvgDirect(
 			inputBuffer = Buffer.from(arrayBuffer);
 		}
 
-		// Process the image with sharp
-		const buffer = await sharp(inputBuffer)
-			.greyscale()
-			.normalise()
-			.png()
-			.toBuffer();
-
-		// Trace the image
+		// Trace the image directly without sharp preprocessing
 		const svg = await new Promise<string>((resolve, reject) => {
 			potrace.trace(
-				buffer,
+				inputBuffer,
 				{
 					threshold: options.threshold || 128,
 					color: "currentColor",
@@ -97,14 +77,16 @@ export async function convertPngToSvgDirect(
 
 						let viewBox = "0 0 24 24";
 						if (viewBoxMatch) {
+							// Use existing viewBox if available
 							viewBox = viewBoxMatch[1];
 						} else if (widthMatch && heightMatch) {
+							// Create viewBox from width and height
 							const width = Number.parseFloat(widthMatch[1]);
 							const height = Number.parseFloat(heightMatch[1]);
 							viewBox = `0 0 ${width} ${height}`;
 						}
 
-						// Clean up the SVG
+						// Clean up the SVG while preserving the correct viewBox
 						const cleanedSvg = svg
 							.replace(
 								/<svg[^>]*>/,
@@ -119,16 +101,13 @@ export async function convertPngToSvgDirect(
 			);
 		});
 
-		return {
-			svg,
-			success: true,
-		};
+		return NextResponse.json({ svg });
 	} catch (error) {
-		console.error("Direct SVG conversion error:", error);
-		return {
-			svg: "",
-			success: false,
-			error: error instanceof Error ? error.message : "SVG conversion error occurred",
-		};
+		console.error("Image tracing error:", error);
+		const errorMessage =
+			error && typeof error === "object" && "message" in error
+				? String(error.message)
+				: "Failed to trace image";
+		return NextResponse.json({ error: errorMessage }, { status: 500 });
 	}
 }
