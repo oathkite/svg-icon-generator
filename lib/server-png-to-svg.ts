@@ -30,6 +30,19 @@ export async function convertPngToSvgServer(
 			}),
 		});
 
+		// Check if response is JSON
+		const contentType = response.headers.get("content-type");
+		if (!contentType || !contentType.includes("application/json")) {
+			console.error("Received non-JSON response from trace-image API:", contentType);
+			const text = await response.text();
+			console.error("Response body:", text.substring(0, 200));
+			return {
+				svg: "",
+				success: false,
+				error: "API endpoint returned HTML instead of JSON. Check server configuration.",
+			};
+		}
+
 		const data = await response.json();
 
 		if (!response.ok) {
