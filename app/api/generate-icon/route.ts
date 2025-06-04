@@ -1,5 +1,4 @@
 import { convertPngToSvgServer } from "@/lib/server-png-to-svg";
-import { convertPngToSvgDirect } from "@/lib/direct-png-to-svg";
 import type { GenerationResult } from "@/types";
 import { type NextRequest, NextResponse } from "next/server";
 
@@ -132,32 +131,8 @@ export async function POST(request: NextRequest) {
 		}
 
 		// Convert PNG to SVG using the shared utility
-		// Get the base URL from environment variable or construct from headers
-		let baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.URL || process.env.DEPLOY_URL;
-		
-		if (!baseUrl) {
-			// Fallback to constructing from request headers
-			const protocol = request.headers.get("x-forwarded-proto") || "https";
-			const host = request.headers.get("host") || request.headers.get("x-forwarded-host");
-			
-			if (host) {
-				baseUrl = `${protocol}://${host}`;
-			} else {
-				// Last resort fallback for local development
-				baseUrl = `http://localhost:${process.env.PORT || 3000}`;
-			}
-		}
-		
-		console.log("Using baseUrl for trace-image API:", baseUrl);
-		
-		// Try server conversion first, fall back to direct conversion if it fails
-		let conversionResult = await convertPngToSvgServer(imageDataUrl, baseUrl);
-		
-		// If server conversion fails with HTML response, try direct conversion
-		if (!conversionResult.success && conversionResult.error?.includes("HTML instead of JSON")) {
-			console.log("Server conversion failed, trying direct conversion");
-			conversionResult = await convertPngToSvgDirect(imageDataUrl);
-		}
+		const baseUrl = request.headers.get("origin") || `http://localhost:${process.env.PORT || 3000}`;
+		const conversionResult = await convertPngToSvgServer(imageDataUrl, baseUrl);
 
 		// Use the converted SVG or fallback to default
 		const svg = conversionResult.success
